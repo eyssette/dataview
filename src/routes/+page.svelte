@@ -17,6 +17,7 @@
 	let getURL='';
 	let dataParsed;
 	let src;
+	let fetchOK=false;
 
 	onMount(() => {
 		//baseURL = window.location.origin + window.location.pathname;
@@ -27,6 +28,10 @@
 	/* for (const url of src) {
 		promises.push(fetch(url));
 	} */	
+
+	/* 
+	Pas besoin de PromiseAll, pas besoin de construire des promises avant car une seule URL ! => simplifier le code
+	*/
 	
 	$: {
 		if(getURL!='') {
@@ -42,6 +47,7 @@
 
 	async function fetchCsv() {
 		const responses = await Promise.all(promises);
+		fetchOK = responses[0].ok
 		const data = await Promise.all(responses.map(response => response.text()));
 		let headers;
 		parsedData=[];
@@ -56,22 +62,26 @@
 		parsedData.unshift(headers);
 		return parsedData;
 	}
-
-	dataParsed = fetchCsv();
 </script>
 
 <h1>{title}</h1>
 
 {#await dataParsed}
-	<p><span class="loader"></span></p>
-	<p>Chargement des données. Merci de patienter.</p>
+	{#if getURL==''}
+		<p>Pas d'URL</p>
+	{:else}
+		<p><span class="loader"></span></p>
+		<p>Chargement des données. Merci de patienter.</p>
+	{/if}
 {:then dataParsed}
-	{#if getURL!=''}
+	{#if getURL!='' && fetchOK == true}
 	<div class="search">
 		<Search bind:textToSearch/>
 	</div>
 	<Table {dataParsed} bind:textToSearch />
 	<footer class="contentAfterTable">{@html contentAfterTable}</footer>
+	{:else}
+		<p>Erreur pendant le chargement des données</p>
 	{/if}
 {:catch error}
 	<p style="color: red">{error.message}</p>

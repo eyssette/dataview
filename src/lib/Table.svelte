@@ -213,7 +213,7 @@
 	<tbody bind:this={dataTable}>
 		{#if desactivateRegexDefault==true && textToSearch==''}
 			<tr>
-				<td colspan="{headersLength}" class="info-search">Utilisez l'outil de recherche ci-dessus : les textes qui correspondent à la recherche s'afficheront ci-dessous</td>
+				<td colspan="{headersLength}" class="info-search">Utilisez l'outil de recherche ci-dessus : les résultats qui correspondent à la recherche s'afficheront ci-dessous</td>
 			</tr>
 		{:else}
 			{#if previoustextToSearch != textToSearch && textToSearch!=''}
@@ -224,12 +224,12 @@
 					</td>
 				</tr>
 			{:else}
-				{#if innerWidth <=600 && textToSearch==textToSearchDefaultSmallScreen && automaticSearch === true}
+				{#if innerWidth <=600 && textToSearch==textToSearchDefaultSmallScreen && automaticSearch === true && textToSearchDefaultSmallScreen!=''}
 					<tr>
 						<td colspan="{headersLength}" class="info-search">Sur un petit écran, seule une partie des données s'affiche par défaut. Utilisez le moteur de recherche ci-dessus pour trouver ce qui vous intéresse, ou cliquez sur : <button on:click={()=>textToSearch=''}>Voir toutes les données</button></td>
 					</tr>
 				{/if}
-				{#if innerWidth>600 && automaticSearch === true && textToSearch==textToSearchDefault}
+				{#if innerWidth>600 && automaticSearch === true && textToSearch==textToSearchDefault && textToSearchDefault!=''}
 					<tr>
 						<td colspan="{headersLength}" class="info-search"><strong>Par défaut, seule une partie des données s'affiche.</strong><br />Utilisez le moteur de recherche ci-dessus pour trouver ce qui vous intéresse. <br>Ou cliquez sur : <button on:click={()=>textToSearch=''}>Voir toutes les données</button></td>
 					</tr>
