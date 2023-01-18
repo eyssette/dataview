@@ -24,14 +24,59 @@
 	} from './searchFunctions.js';
 	import MarkResults from './MarkResults.svelte';
 	import AdditionalConditions from './AdditionalConditions.svelte';
+	import {
+		onMount
+	} from 'svelte';
 	export let dataParsed;
 	export let textToSearch;
+	export let sumFetchSize;
 	let dataTable;
 	let search_items;
 	let sortColumns = false;
 	let historyColumnsClick = historyColumnsClickDefault;
+	let searchParams;
+	let automaticSearchParam = automaticSearch
+	let desactivateRegexDefaultParam = desactivateRegexDefault
+	let scoreDisplayParam
+	let activateFiltersParam
+	let textToSearchDefaultParam
+	let textToSearchDefaultSmallScreenParam
+	let dataNoHeaderParam
+	let changeHeaderParam
+	let newHeaderParam
+	let smallColumnsParam
+	let smallColumnsIfSmallScreenParam
+	let historyColumnsClickDefaultParam
+	let tableCSSsearchParams
 
 	const innerWidth = window.innerWidth;
+
+	onMount(() => {
+		searchParams = (new URL(document.location)).searchParams;
+		automaticSearchParam = searchParams.get('as');
+		desactivateRegexDefaultParam = searchParams.get('dr');
+		scoreDisplayParam = searchParams.get('sd');
+		activateFiltersParam = searchParams.get('af');
+		textToSearchDefaultParam = searchParams.get('ttsd');
+		textToSearchDefaultSmallScreenParam = searchParams.get('ttsdss');
+		dataNoHeaderParam = searchParams.get('dnh');
+		changeHeaderParam = searchParams.get('ch');
+		newHeaderParam = searchParams.get('nh');
+		smallColumnsParam = searchParams.get('sc');
+		smallColumnsIfSmallScreenParam = searchParams.get('scss');
+		historyColumnsClickDefaultParam = searchParams.get('hccd');
+		tableCSSsearchParams = searchParams.get('tcss');
+	})
+
+	$: {
+		if (automaticSearchParam == '0') {
+			automaticSearchParam = false
+		}
+		if (sumFetchSize >= 200000) {
+			automaticSearchParam = false;
+			desactivateRegexDefaultParam = true;
+		}
+	}
 
 	let headers;
 	let dataArray = Object.values(dataParsed);
@@ -41,7 +86,7 @@
 	if (innerWidth <= 600) {
 		textToSearch = textToSearchDefaultSmallScreen;
 	}
-	if (innerWidth > 600 && automaticSearch == true) {
+	if (innerWidth > 600 && automaticSearchParam == true) {
 		textToSearch = textToSearchDefault;
 	}
 	if (dataNoHeader == false) {
@@ -71,7 +116,7 @@
 		return initialString.substring(0, pos) + stringToAdd + initialString.substring(pos)
 	}
 
-	$: if (activateFilters == true && desactivateRegexDefault == false) {
+	$: if (activateFilters == true && desactivateRegexDefaultParam == false) {
 		/* Si on arrive sur la page via un lien avec un hash, il faut remplir les filtres avec les informations du hash */
 		let textFromTextToSearch = textToSearch;
 		let hashFiltersArray = textFromTextToSearch.split('\+\+\(\?='); /* Les deux “+” sont nécessaires pour ne pas entrer en conflit avec d'éventuelles regex dans les conditions supplémentaires */
@@ -134,7 +179,7 @@
 	$: if (textToSearch !== '' && previoustextToSearch !== textToSearch) {
 		pattern = '';
 		search_items = textToSearch.toLowerCase().split("+");
-		if (desactivateRegexDefault === false) {
+		if (desactivateRegexDefaultParam === false) {
 			for (const search_item of search_items) {
 				pattern = pattern + "(?=.*" + search_item + ")";
 			}
@@ -184,11 +229,12 @@
 	}
 </script>
 
-{#if useAdditionalConditions == true && desactivateRegexDefault == false}
+{#if useAdditionalConditions == true && desactivateRegexDefaultParam == false}
 	<div class="additionalConditions">
 		<AdditionalConditions bind:textToSearch/>
 	</div>
 {/if}
+
 
 <table class:one-column="{headersLength===1}" class="{tableCSS}">
 	{#if headers}	
@@ -197,11 +243,11 @@
 				{#each headers as header, i}
 					<th data-key="{header}" on:click={() => sortColumnOnClick(i)}>{@html header}</th>
 				{/each}
-				{#if scoreDisplay === true && automaticSearch === false}
+				{#if scoreDisplay === true && automaticSearchParam === false}
 					<th on:click={() => sortColumnOnClick(headersLength)}>Score</th>
 				{/if}
 			</tr>
-			{#if innerWidth > 600 && activateFilters==true && desactivateRegexDefault==false && headersLength>1}
+			{#if innerWidth > 600 && activateFilters==true && desactivateRegexDefaultParam==false && headersLength>1}
 				<tr class="filters">
 					{#each headers as header, i}
 						<td><input type="text" id="filter-{i}" name="filter-{i}" bind:value={filters[i]} placeholder="filtre"></td>
@@ -211,12 +257,12 @@
 		</thead>
 	{/if}
 	<tbody bind:this={dataTable}>
-		{#if desactivateRegexDefault==true && textToSearch==''}
+		{#if desactivateRegexDefaultParam==true && textToSearch==''}
 			<tr>
 				<td colspan="{headersLength}" class="info-search">Utilisez l'outil de recherche ci-dessus : les résultats qui correspondent à la recherche s'afficheront ci-dessous</td>
 			</tr>
 		{:else}
-			{#if previoustextToSearch != textToSearch && textToSearch!=''}
+			{#if previoustextToSearch != textToSearch && textToSearch!='' && automaticSearchParam == false}
 				<tr>
 					<td colspan="{headersLength}">
 						<p><span class="loader"></span></p>
@@ -224,12 +270,12 @@
 					</td>
 				</tr>
 			{:else}
-				{#if innerWidth <=600 && textToSearch==textToSearchDefaultSmallScreen && automaticSearch === true && textToSearchDefaultSmallScreen!=''}
+				{#if innerWidth <=600 && textToSearch==textToSearchDefaultSmallScreen && automaticSearchParam === true && textToSearchDefaultSmallScreen!=''}
 					<tr>
 						<td colspan="{headersLength}" class="info-search">Sur un petit écran, seule une partie des données s'affiche par défaut. Utilisez le moteur de recherche ci-dessus pour trouver ce qui vous intéresse, ou cliquez sur : <button on:click={()=>textToSearch=''}>Voir toutes les données</button></td>
 					</tr>
 				{/if}
-				{#if innerWidth>600 && automaticSearch === true && textToSearch==textToSearchDefault && textToSearchDefault!=''}
+				{#if innerWidth>600 && automaticSearchParam === true && textToSearch==textToSearchDefault && textToSearchDefault!=''}
 					<tr>
 						<td colspan="{headersLength}" class="info-search"><strong>Par défaut, seule une partie des données s'affiche.</strong><br />Utilisez le moteur de recherche ci-dessus pour trouver ce qui vous intéresse. <br>Ou cliquez sur : <button on:click={()=>textToSearch=''}>Voir toutes les données</button></td>
 					</tr>

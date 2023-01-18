@@ -14,46 +14,48 @@
 	let parsedData = [];
 	let promises = [];
 	let searchParams;
-	let getURL='';
+	let getURL = '';
 	let dataParsed;
 	let src;
-	let fetchOK=false;
+	let fetchOK = false;
+	let sumFetchSize;
+	let delimiterPapaParse=''
+	let delimiterPapaParseParam;
 
 	onMount(() => {
 		//baseURL = window.location.origin + window.location.pathname;
 		searchParams = (new URL(document.location)).searchParams;
-		getURL=searchParams.get('url');
+		getURL = searchParams.get('url');
+		delimiterPapaParseParam = searchParams.get('d');
 	});
 
-	/* for (const url of src) {
-		promises.push(fetch(url));
-	} */	
-
-	/* 
-	Pas besoin de PromiseAll, pas besoin de construire des promises avant car une seule URL ! => simplifier le code
-	*/
-	
 	$: {
-		if(getURL!='') {
-			src=[];
-			src.push(getURL);
-			promises=[];
+		if (getURL != '' && getURL !== null) {
+			if (delimiterPapaParseParam !== null) {
+				if (delimiterPapaParseParam =='\\t') {delimiterPapaParseParam='\t'}
+				delimiterPapaParse=delimiterPapaParseParam
+				console.log(delimiterPapaParse);
+			}
+			src = getURL.split('|');
+			promises = [];
 			for (const url of src) {
 				promises.push(fetch(url));
 			}
 			dataParsed = fetchCsv();
-		}		
+		}
 	}
 
 	async function fetchCsv() {
 		const responses = await Promise.all(promises);
-		fetchOK = responses[0].ok
+		fetchOK = responses.every((fetchURL) => fetchURL.ok == true)
+		const fetchSizeArray = responses.map(response => response.headers.get("content-length"));
+		sumFetchSize = fetchSizeArray.reduce((a, b) => parseInt(a) + parseInt(b), 0);
 		const data = await Promise.all(responses.map(response => response.text()));
 		let headers;
-		parsedData=[];
+		parsedData = [];
 		for (const csvData of data) {
 			const parse = Papa.parse(csvData, {
-				
+				delimiter: delimiterPapaParse,
 			}).data;
 			dataNoHeader ? headers = [] : headers = parse.shift();
 			parsedData = [...parsedData, ...parse];
@@ -65,26 +67,27 @@
 
 <h1>{title}</h1>
 
-{#await dataParsed}
-	{#if getURL==''}
-		<p>Pas d'URL</p>
-	{:else}
-		<p><span class="loader"></span></p>
-		<p>Chargement des données. Merci de patienter.</p>
-	{/if}
-{:then dataParsed}
-	{#if getURL!='' && fetchOK == true}
-	<div class="search">
-		<Search bind:textToSearch/>
-	</div>
-	<Table {dataParsed} bind:textToSearch />
-	<footer class="contentAfterTable">{@html contentAfterTable}</footer>
-	{:else}
+{#if getURL=='' || getURL==null}
+	<p>Pas d'URL</p>
+{:else}
+	{#await dataParsed}
+			<p><span class="loader"></span></p>
+			<p>Chargement des données. Merci de patienter.</p>
+	{:then dataParsed}
+		{#if fetchOK == true}
+			<div class="search">
+				<Search bind:textToSearch bind:sumFetchSize/>
+			</div>
+			<Table {dataParsed} bind:textToSearch  bind:sumFetchSize />
+			<footer class="contentAfterTable">{@html contentAfterTable}</footer>
+		{:else}
+			<p>Erreur pendant le chargement des données</p>
+		{/if}
+	{:catch error}
 		<p>Erreur pendant le chargement des données</p>
-	{/if}
-{:catch error}
-	<p style="color: red">{error.message}</p>
-{/await}
+		<p style="color: red">{error.message}</p>
+	{/await}
+{/if}
 
 <style>
 	:global(body) {
