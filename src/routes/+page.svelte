@@ -68,7 +68,7 @@
 <h1>{title}</h1>
 
 {#if getURL=='' || getURL==null}
-	<p>Pas d'URL</p>
+	<p>Pas d'URL. Pour que Dataview fonctionne, il faut indiquer dans l'URL la source de vos données, en ajoutant '?url=VOTRE_URL'.</p>
 {:else}
 	{#await dataParsed}
 			<p><span class="loader"></span></p>
