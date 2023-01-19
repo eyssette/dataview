@@ -18,6 +18,7 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/adapter-static": "^1.0.0",
+		"dompurify": "^2.4.3",
 		"mark.js": "^8.11.1",
 		"papaparse": "^5.3.2"
 	}

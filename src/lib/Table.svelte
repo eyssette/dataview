@@ -1,4 +1,5 @@
 <script>
+	import DOMPurify from 'dompurify';
 	import {
 		reorganizeData,
 		reorganizeDataIfSmallScreen,
@@ -241,7 +242,7 @@
 		<thead>
 			<tr>
 				{#each headers as header, i}
-					<th data-key="{header}" on:click={() => sortColumnOnClick(i)}>{@html header}</th>
+					<th data-key="{header}" on:click={() => sortColumnOnClick(i)}>{@html DOMPurify.sanitize(header)}</th>
 				{/each}
 				{#if scoreDisplay === true && automaticSearchParam === false}
 					<th on:click={() => sortColumnOnClick(headersLength)}>Score</th>
@@ -284,7 +285,7 @@
 					{#each rows as row}
 						<tr>
 							{#each row as cell,i}
-								<td class:small="{innerWidth<=600 ? smallColumnsIfSmallScreen.includes(i+1) : smallColumns.includes(i+1)}">{@html cell}</td>
+								<td class:small="{innerWidth<=600 ? smallColumnsIfSmallScreen.includes(i+1) : smallColumns.includes(i+1)}">{@html DOMPurify.sanitize(cell)}</td>
 							{/each}
 						</tr>
 					{/each}
