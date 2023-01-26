@@ -19,7 +19,7 @@
 	let src;
 	let fetchOK = false;
 	let sumFetchSize;
-	let delimiterPapaParse=''
+	let delimiterPapaParse = ''
 	let delimiterPapaParseParam;
 
 	onMount(() => {
@@ -32,9 +32,10 @@
 	$: {
 		if (getURL != '' && getURL !== null) {
 			if (delimiterPapaParseParam !== null) {
-				if (delimiterPapaParseParam =='\\t') {delimiterPapaParseParam='\t'}
-				delimiterPapaParse=delimiterPapaParseParam
-				console.log(delimiterPapaParse);
+				if (delimiterPapaParseParam == '\\t') {
+					delimiterPapaParseParam = '\t'
+				}
+				delimiterPapaParse = delimiterPapaParseParam;
 			}
 			src = getURL.split('|');
 			promises = [];
