@@ -6,7 +6,8 @@ export const title = "Dataview";
 /* https://raw.githubusercontent.com/eyssette/sujets-philosophie-bac/main/data/dissertations.tsv */
 /* export const src = ['https://raw.githubusercontent.com/eyssette/sujets-philosophie/main/data/sujets-vrac.tsv'] */
 
-export const contentAfterTable = 'Site créé par <a href="http://eyssette.github.io/">Cédric Eyssette</a>';
+export const contentAfterTable =
+	'Site créé par <a href="http://eyssette.github.io/">Cédric Eyssette</a>';
 
 /* Si la base de données est trop importante, il faut que la recherche ne se déclenche pas automatiquement, mais seulement en appuyant sur Entrée, et il faut désactiver l'utilisation d'une regex. On peut également choisir de calculer un score de pertinence ou non. */
 export const automaticSearch = true;
@@ -15,8 +16,8 @@ export const scoreDisplay = false;
 
 export const activateFilters = false;
 
-export const textToSearchDefaultSmallScreen = '';
-export const textToSearchDefault = '';
+export const textToSearchDefaultSmallScreen = "";
+export const textToSearchDefault = "";
 
 /* Pour réorganiser les données (notamment pour faire une version différente sur mobile) */
 export const reorganizeData = false;
@@ -36,7 +37,7 @@ export const newHeader = [];
 /* export const newHeader = ['Intitulé du sujet']; */
 
 /* Pour que certaines colonnes s'affichent en plus petit */
-export const smallColumns = []
+export const smallColumns = [];
 export const smallColumnsIfSmallScreen = [];
 
 /* Surligner les mots recherchés */
@@ -45,7 +46,7 @@ export const markText = true;
 /* Si les données sont déjà triées en ordre ascendant pour une colonne, il faut l'indiquer ici, en notant les numéros des colonnes concernées */
 export let historyColumnsClickDefault = [0];
 
-export const tableCSS = '';
+export const tableCSS = "";
 /* export let tableCSS='small' */
 
 /* Pour indiquer des conditions supplémentaires possibles (cases à cocher) avec le format suivant : intitulé de la condition, regex correspondante. Les conditions supplémentaires ne sont possibles que si desactivateRegexDefault = false */
