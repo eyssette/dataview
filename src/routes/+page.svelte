@@ -3,7 +3,7 @@
 	import Papa from "papaparse";
 	import Table from "../lib/Table.svelte";
 	import Search from "../lib/Search.svelte";
-	import { title, dataNoHeader, contentAfterTable } from "../lib/config.js";
+	import { title, contentAfterTable } from "../lib/config.js";
 	let textToSearch = "";
 	let parsedData = [];
 	let promises = [];
@@ -16,12 +16,20 @@
 	let delimiterPapaParse = "";
 	let delimiterPapaParseParam;
 	let baseURL;
+	let checkDataNoHeader = false;
+	let inputNewHeader;
+	let dataNoHeader;
+	let dataNoHeaderParam;
+	let newHeader = [];
+	let newHeaderParam;
 
 	onMount(() => {
-		baseURL = window.location.origin + window.location.pathname
+		baseURL = window.location.origin + window.location.pathname;
 		searchParams = new URL(document.location).searchParams;
 		getURL = searchParams.get("url");
 		delimiterPapaParseParam = searchParams.get("d");
+		dataNoHeaderParam = searchParams.get("dnh");
+		newHeaderParam = searchParams.get("nh");
 	});
 
 	$: {
@@ -31,6 +39,17 @@
 					delimiterPapaParseParam = "\t";
 				}
 				delimiterPapaParse = delimiterPapaParseParam;
+			}
+			if (dataNoHeaderParam !== null) {
+				if (dataNoHeaderParam == "1") {
+					dataNoHeaderParam = true;
+				} else {
+					dataNoHeaderParam = false;
+				}
+				dataNoHeader = dataNoHeaderParam;
+				if (newHeaderParam !== null) {
+					newHeader = newHeaderParam.split("|");
+				}
 			}
 			src = getURL.split("|");
 			promises = [];
@@ -61,7 +80,7 @@
 				delimiter: delimiterPapaParse,
 				comments: "# ",
 			}).data;
-			dataNoHeader ? (headers = []) : (headers = parse.shift());
+			dataNoHeader ? (headers = newHeader) : (headers = parse.shift());
 			parsedData = [...parsedData, ...parse];
 		}
 		parsedData.unshift(headers);
@@ -70,7 +89,7 @@
 
 	let inputURL;
 	let inputDelimiter;
-	
+
 	function inputButtonClick() {
 		delimiterPapaParseParam = inputDelimiter;
 		let gotoURL = baseURL;
@@ -80,13 +99,19 @@
 		if (delimiterPapaParseParam != "" && delimiterPapaParseParam != undefined) {
 			gotoURL = gotoURL + "&d=" + delimiterPapaParseParam;
 		}
+		if (checkDataNoHeader) {
+			gotoURL = gotoURL + "&dnh=1";
+		}
+		if (inputNewHeader != "" && inputNewHeader != undefined) {
+			gotoURL = gotoURL + "&nh=" + inputNewHeader;
+		}
 		/* goto(gotoURL) */
 		/* getURL = inputURL; */
 		window.location.href = gotoURL;
 		/* window.location.href = ""; */
 	}
 	function titleClick() {
-		dataParsed=undefined;
+		dataParsed = undefined;
 		window.location.href = baseURL;
 	}
 </script>
@@ -95,16 +120,24 @@
 
 {#if getURL == "" || getURL == null}
 	<p>
-		Pas de données à afficher. Complétez les informations ci-dessous et cliquez
-		sur le bouton “Envoyer”
+		Complétez les informations ci-dessous et cliquez sur le bouton “Envoyer”
 	</p>
-	<div id="inputs">
+	<form on:submit|preventDefault={inputButtonClick}>
 		<p>
-			<label for="inputURL">Source de vos données : </label>
-			<input type="text" id="inputURL" name="inputURL" bind:value={inputURL} />
+			<label for="inputURL"
+				>Sources de vos données <span>(séparez chaque URL avec “|”)</span> :
+			</label>
+			<input
+				type="text"
+				id="inputURL"
+				name="inputURL"
+				size="40"
+				bind:value={inputURL} />
 		</p>
 		<p>
-			<label for="inputDelimiter">Délimitation des champs : </label>
+			<label for="inputDelimiter"
+				>Délimitation des champs <span>(“\t” pour des tabulations)</span> :
+			</label>
 			<input
 				type="text"
 				id="inputDelimiter"
@@ -112,8 +145,29 @@
 				size="5"
 				bind:value={inputDelimiter} />
 		</p>
+		<p>
+			<label for="checkDataNoHeader"
+				>Cochez cette case si la première ligne de vos données ne contient pas
+				le titre des colonnes</label>
+			<input
+				type="checkbox"
+				id="checkDataNoHeader"
+				name="checkDataNoHeader"
+				bind:checked={checkDataNoHeader} />
+		</p>
+		{#if checkDataNoHeader}
+			<p>
+				<label for="inputNewHeader">Titre des colonnes : </label>
+				<input
+					type="text"
+					id="inputNewHeader"
+					name="inputNewHeader"
+					bind:value={inputNewHeader} />
+			</p>
+		{/if}
+
 		<button on:click={inputButtonClick}>Envoyer</button>
-	</div>
+	</form>
 {:else}
 	{#await dataParsed}
 		<p><span class="loader" /></p>
@@ -149,12 +203,23 @@
 
 	.search,
 	footer,
-	#inputs {
+	form {
 		max-width: 960px;
 		margin: auto;
 		width: 80%;
 		text-align: center;
 		font-size: 0.9em;
+	}
+	form {
+		margin-top: 2em;
+		background-color: #f3f3f3;
+		max-width: 400px;
+		padding: 2em 1em 3em 1em;
+		border-radius: 10px;
+	}
+
+	form span {
+		font-size: 0.8em;
 	}
 
 	footer {
@@ -162,6 +227,11 @@
 		font-size: 1em;
 		margin-bottom: 3em;
 		max-width: 800px !important;
+	}
+
+	input {
+		display: inline-block;
+		margin-top: 0.5em;
 	}
 
 	:global(.loader) {
@@ -179,8 +249,8 @@
 
 	a {
 		text-decoration: none;
-		color:#6a0012;
-		font-size:0.7em;
+		color: #6a0012;
+		font-size: 0.7em;
 	}
 
 	@keyframes spin {

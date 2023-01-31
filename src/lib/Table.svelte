@@ -33,7 +33,7 @@
 	let searchParams;
 	let automaticSearchParam = automaticSearch;
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
-	let scoreDisplayParam;
+	/* let scoreDisplayParam;
 	let activateFiltersParam;
 	let textToSearchDefaultParam;
 	let textToSearchDefaultSmallScreenParam;
@@ -43,7 +43,7 @@
 	let smallColumnsParam;
 	let smallColumnsIfSmallScreenParam;
 	let historyColumnsClickDefaultParam;
-	let tableCSSsearchParams;
+	let tableCSSsearchParams; */
 
 	const innerWidth = window.innerWidth;
 
@@ -51,7 +51,7 @@
 		searchParams = new URL(document.location).searchParams;
 		automaticSearchParam = searchParams.get("as");
 		desactivateRegexDefaultParam = searchParams.get("dr");
-		scoreDisplayParam = searchParams.get("sd");
+		/* scoreDisplayParam = searchParams.get("sd");
 		activateFiltersParam = searchParams.get("af");
 		textToSearchDefaultParam = searchParams.get("ttsd");
 		textToSearchDefaultSmallScreenParam = searchParams.get("ttsdss");
@@ -61,7 +61,7 @@
 		smallColumnsParam = searchParams.get("sc");
 		smallColumnsIfSmallScreenParam = searchParams.get("scss");
 		historyColumnsClickDefaultParam = searchParams.get("hccd");
-		tableCSSsearchParams = searchParams.get("tcss");
+		tableCSSsearchParams = searchParams.get("tcss"); */
 	});
 
 	$: {
