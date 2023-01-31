@@ -15,9 +15,10 @@
 	let sumFetchSize;
 	let delimiterPapaParse = "";
 	let delimiterPapaParseParam;
+	let baseURL;
 
 	onMount(() => {
-		//baseURL = window.location.origin + window.location.pathname;
+		baseURL = window.location.origin + window.location.pathname
 		searchParams = new URL(document.location).searchParams;
 		getURL = searchParams.get("url");
 		delimiterPapaParseParam = searchParams.get("d");
@@ -66,15 +67,53 @@
 		parsedData.unshift(headers);
 		return parsedData;
 	}
+
+	let inputURL;
+	let inputDelimiter;
+	
+	function inputButtonClick() {
+		delimiterPapaParseParam = inputDelimiter;
+		let gotoURL = baseURL;
+		if (inputURL !== "" && inputURL != undefined) {
+			gotoURL = gotoURL + "?url=" + inputURL;
+		}
+		if (delimiterPapaParseParam != "" && delimiterPapaParseParam != undefined) {
+			gotoURL = gotoURL + "&d=" + delimiterPapaParseParam;
+		}
+		/* goto(gotoURL) */
+		/* getURL = inputURL; */
+		window.location.href = gotoURL;
+		/* window.location.href = ""; */
+	}
+	function titleClick() {
+		dataParsed=undefined;
+		window.location.href = baseURL;
+	}
 </script>
 
-<h1>{title}</h1>
+<h1>{title} <a href="/" on:click={titleClick}>⌂</a></h1>
 
 {#if getURL == "" || getURL == null}
 	<p>
-		Pas d'URL. Pour que Dataview fonctionne, il faut indiquer dans l'URL la
-		source de vos données, en ajoutant '?url=VOTRE_URL'.
+		Pas de données à afficher. Complétez les informations ci-dessous et cliquez
+		sur le bouton “Envoyer”
 	</p>
+	<div id="inputs">
+		<p>
+			<label for="inputURL">Source de vos données : </label>
+			<input type="text" id="inputURL" name="inputURL" bind:value={inputURL} />
+		</p>
+		<p>
+			<label for="inputDelimiter">Délimitation des champs : </label>
+			<input
+				type="text"
+				id="inputDelimiter"
+				name="inputDelimiter"
+				size="5"
+				bind:value={inputDelimiter} />
+		</p>
+		<button on:click={inputButtonClick}>Envoyer</button>
+	</div>
 {:else}
 	{#await dataParsed}
 		<p><span class="loader" /></p>
@@ -109,7 +148,8 @@
 	}
 
 	.search,
-	footer {
+	footer,
+	#inputs {
 		max-width: 960px;
 		margin: auto;
 		width: 80%;
@@ -135,6 +175,12 @@
 		text-align: center !important;
 		padding: 20px;
 		margin: 3em auto;
+	}
+
+	a {
+		text-decoration: none;
+		color:#6a0012;
+		font-size:0.7em;
 	}
 
 	@keyframes spin {

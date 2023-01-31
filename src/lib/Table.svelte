@@ -288,7 +288,7 @@
 			</tr>
 		{:else if previoustextToSearch != textToSearch && textToSearch != "" && automaticSearchParam == false}
 			<tr>
-				<td colspan={headersLength}>
+				<td colspan={scoreDisplay ? headersLength+1 : headersLength}>
 					<p><span class="loader" /></p>
 					<p class="info-search">Recherche en cours</p>
 				</td>

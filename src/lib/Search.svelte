@@ -16,7 +16,7 @@
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
 
 	onMount(() => {
-		baseURL = window.location.origin + window.location.pathname;
+		baseURL = window.location.origin + window.location.pathname + window.location.search ;
 		hash = window.location.hash;
 		if (hash) {
 			inputValue = decodeURI(
