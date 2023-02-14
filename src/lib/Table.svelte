@@ -192,12 +192,12 @@
 		search_items = textToSearch.toLowerCase().split("+");
 		if (desactivateRegexDefaultParam === false) {
 			for (const search_item of search_items) {
-				pattern = pattern + "(?=.*" + search_item + ")";
+				pattern = pattern + "(?=.*?" + search_item + ")";
 			}
 			try {
 				regex = new RegExp(pattern, "i");
 				rows = dataArray.filter((row) =>
-					row.join("\t").toLowerCase().match(regex)
+					row.join("\t").match(regex)
 				);
 				previoustextToSearch = textToSearch;
 			} catch (e) {
