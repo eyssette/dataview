@@ -57,6 +57,9 @@
 				if (url.startsWith("https://codimd.apps.education.fr/") && !url.endsWith("download")) {
 					url = url+'/download'
 					url = url.replace('//download','/download')
+					url = url.replace('?both','')
+					url = url.replace('?edit','')
+					url = url.replace('?view','')
 				}
 				promises.push(fetch(url));
 			}
