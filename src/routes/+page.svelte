@@ -53,7 +53,11 @@
 			}
 			src = getURL.split("|");
 			promises = [];
-			for (const url of src) {
+			for (let url of src) {
+				if (url.startsWith("https://codimd.apps.education.fr/") && !url.endsWith("download")) {
+					url = url+'/download'
+					url = url.replace('//download','/download')
+				}
 				promises.push(fetch(url));
 			}
 			dataParsed = fetchCsv();
@@ -79,6 +83,7 @@
 			const parse = Papa.parse(csvData, {
 				delimiter: delimiterPapaParse,
 				comments: "# ",
+				skipEmptyLines: "greedy",
 			}).data;
 			dataNoHeader ? (headers = newHeader) : (headers = parse.shift());
 			parsedData = [...parsedData, ...parse];

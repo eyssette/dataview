@@ -85,6 +85,12 @@
 	if (innerWidth > 800 && automaticSearchParam == true) {
 		textToSearch = textToSearchDefault;
 	}
+	if (dataArray[0][0] == '```csv') {
+		dataArray.shift();
+		const finalValue = dataArray[dataArray.length-1][dataArray[dataArray.length-1].length-1]
+		dataArray[dataArray.length-1][dataArray[dataArray.length-1].length-1] =finalValue.replace('```','')
+	}
+
 	if (dataNoHeader == false) {
 		headers = dataArray.shift();
 		if (changeHeader) {
