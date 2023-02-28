@@ -33,8 +33,8 @@
 	let searchParams;
 	let automaticSearchParam = automaticSearch;
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
+	let activateFiltersParam = activateFilters;
 	/* let scoreDisplayParam;
-	let activateFiltersParam;
 	let textToSearchDefaultParam;
 	let textToSearchDefaultSmallScreenParam;
 	let dataNoHeaderParam;
@@ -71,7 +71,9 @@
 		if (sumFetchSize >= 200000) {
 			automaticSearchParam = false;
 			desactivateRegexDefaultParam = true;
-		}
+		} /* else {
+			activateFiltersParam = true;
+		} */
 	}
 
 	let headers;
@@ -85,10 +87,19 @@
 	if (innerWidth > 800 && automaticSearchParam == true) {
 		textToSearch = textToSearchDefault;
 	}
-	if (dataArray[0][0] == '```csv') {
+	if (dataArray[0][0] == "```csv") {
 		dataArray.shift();
-		const finalValue = dataArray[dataArray.length-1][dataArray[dataArray.length-1].length-1]
-		dataArray[dataArray.length-1][dataArray[dataArray.length-1].length-1] =finalValue.replace('```','')
+		const finalValue =
+			dataArray[dataArray.length - 1][
+				dataArray[dataArray.length - 1].length - 1
+			];
+		if ((finalValue == "```")) {
+			dataArray.pop();
+		} else {
+			dataArray[dataArray.length - 1][
+				dataArray[dataArray.length - 1].length - 1
+			] = finalValue.replace("```", "");
+		}
 	}
 
 	if (dataNoHeader == false) {
@@ -122,7 +133,10 @@
 		);
 	}
 
-	$: if (activateFilters == true && desactivateRegexDefaultParam == false) {
+	$: if (
+		activateFiltersParam == true &&
+		desactivateRegexDefaultParam == false
+	) {
 		/* Si on arrive sur la page via un lien avec un hash, il faut remplir les filtres avec les informations du hash */
 		let textFromTextToSearch = textToSearch;
 		let hashFiltersArray =
@@ -202,9 +216,7 @@
 			}
 			try {
 				regex = new RegExp(pattern, "i");
-				rows = dataArray.filter((row) =>
-					row.join("\t").match(regex)
-				);
+				rows = dataArray.filter((row) => row.join("\t").match(regex));
 				previoustextToSearch = textToSearch;
 			} catch (e) {
 				console.log("Invalid Regular Expression");
@@ -271,10 +283,11 @@
 					<th on:click={() => sortColumnOnClick(headersLength)}>Score</th>
 				{/if}
 			</tr>
-			{#if innerWidth > 800 && activateFilters == true && desactivateRegexDefaultParam == false && headersLength > 1}
+			{#if innerWidth > 800 && activateFiltersParam == true && desactivateRegexDefaultParam == false && headersLength > 1}
 				<tr class="filters">
 					{#each headers as header, i}
-						<td><input
+						<td
+							><input
 								type="text"
 								id="filter-{i}"
 								name="filter-{i}"
@@ -294,7 +307,7 @@
 			</tr>
 		{:else if previoustextToSearch != textToSearch && textToSearch != "" && automaticSearchParam == false}
 			<tr>
-				<td colspan={scoreDisplay ? headersLength+1 : headersLength}>
+				<td colspan={scoreDisplay ? headersLength + 1 : headersLength}>
 					<p><span class="loader" /></p>
 					<p class="info-search">Recherche en cours</p>
 				</td>
