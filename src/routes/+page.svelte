@@ -22,6 +22,7 @@
 	let dataNoHeaderParam;
 	let newHeader = [];
 	let newHeaderParam;
+	let sourceFormat = "csv-tsv";
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname;
@@ -30,6 +31,9 @@
 		delimiterPapaParseParam = searchParams.get("d");
 		dataNoHeaderParam = searchParams.get("dnh");
 		newHeaderParam = searchParams.get("nh");
+		if (searchParams.get("md") === "1") {
+			sourceFormat = "markdown";
+		}
 	});
 
 	$: {
@@ -63,11 +67,43 @@
 				}
 				promises.push(fetch(url));
 			}
-			dataParsed = fetchCsv();
+			dataParsed = fetchData();
 		}
 	}
 
-	async function fetchCsv() {
+	function markdownToCSV(markdown) {
+		const lines = markdown.split("\n");
+		const csvRows = [];
+		const currentTitles = [];
+		const regex = /^(\d+)\.\s/;
+		let titles = []
+		for (let line of lines) {
+			line = line.replace(/^[\s\t]+/, "");
+			const match = line.match(/^(#+\s)(.+)/);
+			if (match && !line.startsWith("# ")) {
+				const title = match[2];
+				const level = match[1].length - 3;
+				currentTitles[level] = title;
+				for (let i = level + 1; i < currentTitles.length; i++) {
+					currentTitles.pop();
+				}
+			} else if (
+				line.startsWith("- ") ||
+				line.startsWith("* ") ||
+				regex.test(line)
+			) {
+				const data = line.replace("- ", "").replace("* ", "").replace(regex, "");
+				const rowData = currentTitles.concat(data);
+				csvRows.push(rowData.join("\t"));
+			} else if (line.startsWith("Titres :") | line.startsWith("Titles :")) {
+				const titlesLine = line.replace("Titres :","").replace("Titles :","");
+				titles = titlesLine.split("|")
+			}
+		}
+		return [csvRows.join("\n"),titles];
+	}
+
+	async function fetchData() {
 		const responses = await Promise.all(promises);
 		fetchOK = responses.every((fetchURL) => fetchURL.ok == true);
 		const fetchSizeArray = responses.map((response) =>
@@ -77,17 +113,27 @@
 			(a, b) => parseInt(a) + parseInt(b),
 			0
 		);
-		const data = await Promise.all(
+		let data = await Promise.all(
 			responses.map((response) => response.text())
 		);
 		let headers;
 		parsedData = [];
-		for (const csvData of data) {
+		let headersMD = [];
+		for (let csvData of data) {
+			if (sourceFormat=='markdown') {
+				const sourceMarkdown = markdownToCSV(data[0])
+				csvData = sourceMarkdown[0];
+				if (sourceMarkdown[1].length>0) {
+					headersMD = sourceMarkdown[1];
+					dataNoHeader = true;
+				}
+			}
 			const parse = Papa.parse(csvData, {
 				delimiter: delimiterPapaParse,
 				comments: "# ",
 				skipEmptyLines: "greedy",
 			}).data;
+			if (newHeader == '') {newHeader = headersMD}
 			dataNoHeader ? (headers = newHeader) : (headers = parse.shift());
 			parsedData = [...parsedData, ...parse];
 		}
@@ -109,6 +155,9 @@
 		}
 		if (checkDataNoHeader) {
 			gotoURL = gotoURL + "&dnh=1";
+		}
+		if (sourceFormat == "markdown") {
+			gotoURL = gotoURL + "&md=1";
 		}
 		if (inputNewHeader != "" && inputNewHeader != undefined) {
 			gotoURL = gotoURL + "&nh=" + inputNewHeader;
@@ -143,6 +192,13 @@
 				bind:value={inputURL} />
 		</p>
 		<p>
+			<label for="csv-tsv">Données en csv ou tsv :</label>
+			<input type="radio" id="csv-tsv" name="format" value="csv-tsv" checked bind:group={sourceFormat}>
+			<label for="markdown">Données en markdown :</label>
+			<input type="radio" id="markdown" name="format" value="markdown" bind:group={sourceFormat}>
+		</p>
+		{#if sourceFormat=="csv-tsv"}
+		<p>
 			<label for="inputDelimiter"
 				>Délimitation des champs <span>(“\t” pour des tabulations)</span> :
 			</label>
@@ -153,10 +209,10 @@
 				size="5"
 				bind:value={inputDelimiter} />
 		</p>
+		{/if}
 		<p>
 			<label for="checkDataNoHeader"
-				>Cochez cette case si la première ligne de vos données ne contient pas
-				le titre des colonnes</label>
+				>Cochez cette case si {#if sourceFormat=="csv-tsv"}la première ligne de vos données ne contient pas{:else}vos données ne contiennent pas{/if} le titre des colonnes</label>
 			<input
 				type="checkbox"
 				id="checkDataNoHeader"
@@ -165,7 +221,7 @@
 		</p>
 		{#if checkDataNoHeader}
 			<p>
-				<label for="inputNewHeader">Titre des colonnes : </label>
+				<label for="inputNewHeader">Titre des colonnes (à séparer par "|") : </label>
 				<input
 					type="text"
 					id="inputNewHeader"
@@ -173,7 +229,6 @@
 					bind:value={inputNewHeader} />
 			</p>
 		{/if}
-
 		<button on:click={inputButtonClick}>Envoyer</button>
 	</form>
 {:else}
