@@ -16,6 +16,7 @@
 	let automaticSearchParam = automaticSearch;
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
 	let removeAccentsParam = false;
+	let forcedSearchORparam = false
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname + window.location.search ;
@@ -33,6 +34,7 @@
 		automaticSearchParam = searchParams.get("as");
 		desactivateRegexDefaultParam = searchParams.get("dr");
 		removeAccentsParam = searchParams.get("ra");
+		forcedSearchORparam = searchParams.get("fsor");
 	});
 
 	$: {
@@ -65,6 +67,9 @@
 		}
 		if (removeAccentsParam == true) {
 			textToSearch = removeAccents(textToSearch)
+		}
+		if (forcedSearchORparam == true) {
+			textToSearch = textToSearch.replaceAll(" ","+")
 		}
 	}
 
