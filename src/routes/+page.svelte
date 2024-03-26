@@ -23,6 +23,7 @@
 	let newHeader = [];
 	let newHeaderParam;
 	let sourceFormat = "csv-tsv";
+	let showRaw = false;
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname;
@@ -31,6 +32,9 @@
 		delimiterPapaParseParam = searchParams.get("d");
 		dataNoHeaderParam = searchParams.get("dnh");
 		newHeaderParam = searchParams.get("nh");
+		if (searchParams.get('raw') === "1") {
+			showRaw = true;
+		} 
 		if (searchParams.get("md") === "1") {
 			sourceFormat = "markdown";
 		}
@@ -174,7 +178,9 @@
 	}
 </script>
 
-<h1>{title} <a href="/" on:click={titleClick}>⌂</a></h1>
+{#if !showRaw}
+	<h1>{title} <a href="/" on:click={titleClick}>⌂</a></h1>
+{/if}
 
 {#if getURL == "" || getURL == null}
 	<p>
@@ -239,10 +245,12 @@
 	{:then dataParsed}
 		{#if fetchOK == true}
 			<div class="search">
-				<Search bind:textToSearch bind:sumFetchSize />
+				<Search bind:textToSearch bind:sumFetchSize {showRaw} />
 			</div>
-			<Table {dataParsed} bind:textToSearch bind:sumFetchSize />
-			<footer class="contentAfterTable">{@html contentAfterTable}</footer>
+			<Table {dataParsed} bind:textToSearch bind:sumFetchSize {showRaw} />
+			{#if !showRaw}
+				<footer class="contentAfterTable">{@html contentAfterTable}</footer>
+			{/if}
 		{:else}
 			<p>Erreur pendant le chargement des données</p>
 		{/if}

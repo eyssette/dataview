@@ -124,6 +124,7 @@
 	}
 	baseFilterRegex = baseFilterRegex + ".*)";
 	let filter = "";
+	export let showRaw;
 
 	function insertAt(initialString, stringToAdd, pos) {
 		return (
@@ -267,7 +268,7 @@
 
 {#if useAdditionalConditions == true && desactivateRegexDefaultParam == false}
 	<div class="additionalConditions">
-		<AdditionalConditions bind:textToSearch />
+		<AdditionalConditions bind:textToSearch {showRaw} />
 	</div>
 {/if}
 

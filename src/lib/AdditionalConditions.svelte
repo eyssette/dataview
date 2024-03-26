@@ -10,6 +10,7 @@
 	let hash;
 	let conditionsHashStringURL = "";
 	let regexCondition;
+	export let showRaw;
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname;
@@ -74,9 +75,11 @@
 	</p>
 {/each}
 
-<div class="share-search-URL">
-	Copier le lien : <button on:click={copyURL}>🔗</button>
-</div>
+{#if !showRaw}
+	<div class="share-search-URL">
+		Copier le lien : <button on:click={copyURL}>🔗</button>
+	</div>
+{/if}
 
 <style>
 	p {
