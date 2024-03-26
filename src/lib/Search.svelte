@@ -15,6 +15,7 @@
 	let searchParams;
 	let automaticSearchParam = automaticSearch;
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
+	let removeAccentsParam = false;
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname + window.location.search ;
@@ -31,6 +32,7 @@
 		searchParams = new URL(document.location).searchParams;
 		automaticSearchParam = searchParams.get("as");
 		desactivateRegexDefaultParam = searchParams.get("dr");
+		removeAccentsParam = searchParams.get("ra");
 	});
 
 	$: {
@@ -45,6 +47,10 @@
 		}
 	}
 
+	function removeAccents(string) {
+    	return string.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	}
+
 	function searchDatabase() {
 		if (automaticSearchParam == true && desactivateRegexDefault == true) {
 			if (inputValue.length > 2) {
@@ -57,7 +63,12 @@
 		} else {
 			textToSearch = inputValue;
 		}
+		if (removeAccentsParam == true) {
+			textToSearch = removeAccents(textToSearch)
+		}
 	}
+
+
 
 	function copyURL() {
 		navigator.clipboard.writeText(baseURL + "#" + inputValue);
