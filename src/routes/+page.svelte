@@ -64,6 +64,7 @@
 					url = url.replace('?both','')
 					url = url.replace('?edit','')
 					url = url.replace('?view','')
+					url = url.replace(/#$/,'')
 				}
 				promises.push(fetch(url));
 			}
