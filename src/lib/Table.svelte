@@ -349,7 +349,7 @@
 								class:small={innerWidth <= 800
 									? smallColumnsIfSmallScreen.includes(i + 1)
 									: smallColumns.includes(i + 1)}
-								>{@html DOMPurify.sanitize(cell)}</td>
+								>{@html DOMPurify.sanitize(cell,{ADD_ATTR: ['target']})}</td>
 						{/each}
 					</tr>
 				{/each}
