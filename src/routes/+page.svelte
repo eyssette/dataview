@@ -29,7 +29,11 @@
 		baseURL = window.location.origin + window.location.pathname;
 		searchParams = new URL(document.location).searchParams;
 		getURL = searchParams.get("url");
-		delimiterPapaParseParam = searchParams.get("d");
+		if(getURL.endsWith(".tsv")) {
+			delimiterPapaParseParam = "\t";
+		} else {
+			delimiterPapaParseParam = searchParams.get("d");
+		}
 		dataNoHeaderParam = searchParams.get("dnh");
 		newHeaderParam = searchParams.get("nh");
 		if (searchParams.get('raw') === "1") {
