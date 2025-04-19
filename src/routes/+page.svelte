@@ -3,6 +3,7 @@
 	import Papa from "papaparse";
 	import Table from "../lib/Table.svelte";
 	import Search from "../lib/Search.svelte";
+	import {marked} from 'marked';
 	import { title, contentAfterTable } from "../lib/config.js";
 	let textToSearch = "";
 	let parsedData = [];
@@ -141,6 +142,9 @@
 				delimiter: delimiterPapaParse,
 				comments: "# ",
 				skipEmptyLines: "greedy",
+				transform: function (value) {
+					return marked.parseInline(value)
+				}
 			}).data;
 			if (newHeader == '') {newHeader = headersMD}
 			dataNoHeader ? (headers = newHeader) : (headers = parse.shift());
