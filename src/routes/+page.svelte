@@ -273,7 +273,7 @@
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 			"Helvetica Neue", Arial, sans-serif;
 		color: #333;
-		margin:0;
+		margin: 10px 0;
 	}
 
 	h1,
