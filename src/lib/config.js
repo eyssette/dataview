@@ -8,7 +8,7 @@ export const src = undefined;
 /* export const src = ['https://raw.githubusercontent.com/eyssette/sujets-philosophie/main/data/sujets-vrac.tsv'] */
 
 export const contentAfterTable =
-	'Site créé par <a href="http://eyssette.github.io/">Cédric Eyssette</a>';
+	'Site créé par <a href="http://eyssette.forge.apps.education.fr">Cédric Eyssette</a>';
 
 /* Si la base de données est trop importante, il faut que la recherche ne se déclenche pas automatiquement, mais seulement en appuyant sur Entrée, et il faut désactiver l'utilisation d'une regex. On peut également choisir de calculer un score de pertinence ou non. */
 export const automaticSearch = true;
