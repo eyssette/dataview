@@ -4,14 +4,13 @@
 	import Table from "../lib/Table.svelte";
 	import Search from "../lib/Search.svelte";
 	import {marked} from 'marked';
-	import { title, contentAfterTable } from "../lib/config.js";
+	import { title, contentAfterTable, src } from "../lib/config.js";
 	let textToSearch = "";
 	let parsedData = [];
 	let promises = [];
 	let searchParams;
-	let getURL = "";
+	let getURL = src ? src : "";
 	let dataParsed;
-	let src;
 	let fetchOK = false;
 	let sumFetchSize;
 	let delimiterPapaParse = "";
@@ -29,7 +28,8 @@
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname;
 		searchParams = new URL(document.location).searchParams;
-		getURL = searchParams.get("url");
+		const URLparam = searchParams.get("url") ? searchParams.get("url") : "";
+		getURL = getURL ? getURL : URLparam;
 		if(getURL.endsWith(".tsv")) {
 			delimiterPapaParseParam = "\t";
 		} else {
@@ -60,13 +60,13 @@
 					dataNoHeaderParam = false;
 				}
 				dataNoHeader = dataNoHeaderParam;
-				if (newHeaderParam !== null) {
+				if (newHeaderParam && newHeaderParam !== null) {
 					newHeader = newHeaderParam.split("|");
 				}
 			}
-			src = getURL.split("|");
+			getURL = Array.isArray(getURL) ? getURL : getURL.split("|");
 			promises = [];
-			for (let url of src) {
+			for (let url of getURL) {
 				if (url.startsWith("https://codimd.apps.education.fr/") && !url.endsWith("download")) {
 					url = url+'/download'
 					url = url.replace('//download','/download')
