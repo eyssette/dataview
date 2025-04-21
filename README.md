@@ -1,38 +1,24 @@
-# create-svelte
+# Dataview
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+**Dataview** permet de transformer des données au format CSV ou Markdown en un tableau avec un outil de recherche et de classement des données
 
-## Creating a project
+## 🙋‍♀️ Contribuer
 
-If you're seeing this, you've probably already done this step. Congrats!
+Si vous souhaitez contribuer ou tout simplement discuter de ce projet pour participer à l'améliorer, merci de lire le fichier [CONTRIBUTING.md](https://forge.apps.education.fr/dataview/dataview.forge.apps.education.fr/-/blob/main/CONTRIBUTING.md?ref_type=heads).
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## 👩‍⚖️ Licence
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+Dataview est distribué sous licence MIT.
 
-## Developing
+## ⚙️ Développer en local
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Prérequis
 
-```bash
-npm run dev
+1. Récupérer le code de Dataview
+2. Installez `npm` si vous ne l'avez pas
+3. Dans un terminal : `npm run install`
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### Modifier le code
 
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+1. `npm run dev` pour voir le résultat des modifications en direct
+2. `npm run deploy` pour compiler le site et le déployer sur la branche gh-pages
