@@ -16,7 +16,7 @@ Dataview est distribué sous licence MIT.
 
 1. Récupérer le code de Dataview
 2. Installez `npm` si vous ne l'avez pas
-3. Dans un terminal : `npm run install`
+3. Dans un terminal : `npm install`
 
 ### Modifier le code
 
