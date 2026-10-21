@@ -26,6 +26,7 @@
 	export let dataParsed;
 	export let textToSearch;
 	export let sumFetchSize;
+	export let forceRegexUsage;
 	let dataTable;
 	let search_items;
 	let sortColumns = false;
@@ -211,7 +212,7 @@
 	$: if (textToSearch !== "" && previoustextToSearch !== textToSearch) {
 		pattern = "";
 		search_items = textToSearch.toLowerCase().split("+");
-		if (desactivateRegexDefaultParam === false) {
+		if (desactivateRegexDefaultParam === false || forceRegexUsage === true) {
 			for (const search_item of search_items) {
 				pattern = pattern + "(?=.*?" + search_item + ")";
 			}

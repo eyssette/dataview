@@ -17,6 +17,7 @@
 	let desactivateRegexDefaultParam = desactivateRegexDefault;
 	let removeAccentsParam = false;
 	let forcedSearchORparam = false
+	let customORparam;
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname + window.location.search ;
@@ -35,6 +36,7 @@
 		desactivateRegexDefaultParam = searchParams.get("dr");
 		removeAccentsParam = searchParams.get("ra");
 		forcedSearchORparam = searchParams.get("fsor");
+		customORparam = searchParams.get("cor") ? searchParams.get("cor") : "";
 	});
 
 	$: {
@@ -70,6 +72,10 @@
 		}
 		if (forcedSearchORparam == true) {
 			textToSearch = textToSearch.replaceAll(" ","+")
+		}
+		if(customORparam) {
+			textToSearch = textToSearch.replaceAll(customORparam,"|")
+			textToSearch = textToSearch.split("|").map(item => item.trim()).join("|")
 		}
 	}
 

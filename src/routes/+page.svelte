@@ -24,6 +24,7 @@
 	let newHeaderParam;
 	let sourceFormat = "csv-tsv";
 	let showRaw = false;
+	let forceRegexUsage = false;
 
 	onMount(() => {
 		baseURL = window.location.origin + window.location.pathname;
@@ -42,6 +43,9 @@
 		} 
 		if (searchParams.get("md") === "1") {
 			sourceFormat = "markdown";
+		}
+		if(searchParams.get("fru") === "1") {
+			forceRegexUsage = true;
 		}
 	});
 
@@ -255,7 +259,7 @@
 			<div class="search">
 				<Search bind:textToSearch bind:sumFetchSize {showRaw} />
 			</div>
-			<Table {dataParsed} bind:textToSearch bind:sumFetchSize {showRaw} />
+			<Table {dataParsed} bind:textToSearch bind:sumFetchSize {showRaw} {forceRegexUsage} />
 			{#if !showRaw}
 				<footer class="contentAfterTable">{@html contentAfterTable}</footer>
 			{/if}
