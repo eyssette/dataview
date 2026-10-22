@@ -1,6 +1,6 @@
 # Dataview
 
-Dataview est un site web qui permet de visualiser des données provenant de fichiers csv, tsv ou Markdown.
+Dataview est une application web qui permet de visualiser des données provenant de fichiers csv, tsv ou Markdown.
 
 Il permet d'afficher les données sous forme d'un tableau, avec différentes fonctionnalités :
 - tri de chacune des colonnes (tri ascendant/descendant alterné)
@@ -21,14 +21,21 @@ Une fois le formulaire soumis, Dataview récupère le fichier, détecte le forma
 
 ### Cas 2 : il y a un hash dans l'URL
 
-S'il y a un hash dans l'URL, ce hash correspond à l'URL du fichier à visualiser. Dataview récupère le fichier, détecte le format (csv, tsv ou Markdown) et affiche les données avec les options choisies et définies dans l'URL (ou les options par défaut si elles ne sont pas spécifiées dans l'URL).
+S'il y a un hash dans l'URL, ce hash correspond à l'URL du fichier à visualiser. Dataview récupère le fichier, détecte le format (csv, tsv ou Markdown) et affiche les données avec les options choisies et définies soit dans l'URL, soit dans le YAML du fichier Markdown (si le fichier est au format Markdown et contient un YAML avec des options de l'interface de visualisation). S'il n'y a pas d'options définies dans l'URL ou dans le YAML du fichier Markdown, Dataview utilise les options par défaut.
 
 ## Fonctionnalités détaillées
 
 ### Formats de données supportés
 - Fichiers CSV (valeurs séparées par des virgules, ou par un autre délimiteur spécifié)
 - Fichiers TSV (valeurs séparées par des tabulations)
-- Fichiers Markdown avec structure hiérarchique :
+- Fichiers Markdown avec les données intégrées dans un bloc de code ou dans un tableau Markdown
+	- le YAML du fichier Markdown, s'il existe, peut contenir des options pour le format des données et des options de l'interface de visualisation
+	- le titre de niveau 1 du fichier Markdown est utilisé comme titre de la page
+	- il n'y a pas de titres de niveau 2 à 6 dans le fichier Markdown
+	- il y a soit un seul bloc de code, soit un seul tableau Markdown
+		- s'il y a un bloc de code, ce code indique le format des données (csv ou tsv) dans le bloc de code, et les données sont séparées par le délimiteur correspondant (virgule ou tabulation)
+		- s'il y a un tableau Markdown, on récupère les données du tableau Markdown et on les convertit en format CSV pour le traitement, en prenant la première ligne du tableau Markdown comme ligne d'en-tête (titres des colonnes)
+- Fichiers Markdown avec les données définies dans des listes hiérarchiques (titres de niveau 2 à 6 et éléments de liste):
   - Conversion automatique en format CSV pour le traitement
   - Les titres de niveau 2 à 6 deviennent des colonnes hiérarchiques
   - Les éléments de liste (- ou *) sont convertis en lignes de données
@@ -79,8 +86,10 @@ S'il y a un hash dans l'URL, ce hash correspond à l'URL du fichier à visualise
 	- un bouton pour supprimer un filtre est affiché à côté de chaque filtre ajouté
 	- la possibilité de déplacer les filtres pour changer l'ordre d'affichage des filtres en dessous du champ de recherche principal
 - On peut changer la taille par défaut de chaque colonne (et différencier la taille par défaut des colonnes sur un petit écran)
+- On peut choisir d'avoir ou non un champ de recherche pour filtrer les données sur chaque colonne (par défaut, ces champs de recherche sont affichés)
 - On peut choisir entre plusieurs thèmes d'affichage
 - On peut ajouter du CSS personnalisé pour modifier l'apparence de l'interface de visualisation
+- On peut changer le texte du footer (par défaut, le footer renvoie à l'outil Dataview et à son code source, mais on peut le modifier pour mettre un texte personnalisé)
 
 
 ### Interface utilisateur si un hash est présent dans l'URL
@@ -91,8 +100,49 @@ Par défaut, on affiche :
 
 - le titre de la page
 - le descriptif sous le titre
+- En haut à droite : un bouton d'aide qui affiche une modale avec les explications sur le fonctionnement de l'interface de tri et de filtrage des données
 - le formulaire de recherche avec le texte par défaut dans le champ de recherche (par défaut, le champ de recherche est vide)
 - les filtres additionnels (s'il y en a : par défaut, il n'y en a pas)
 - à droite (ou en dessous sur un petit écran) : le bouton pour copier le lien vers la page de l'interface de visualisation avec les informations dans l'URL pour retrouver les mêmes options de l'interface de visualisation et les mêmes options de filtrage et de tri (si l'utilisateur a effectué un filtrage ou un tri des données)
 - le tableau avec les titres de colonnes cliquables pour trier les données (par défaut, le tableau n'est pas trié)
+- en dessous de chaque colonne, un champ de recherche pour filtrer les données sur cette colonne (par défaut, ces champs de recherche sont vides)
 - les résultats de la recherche et du tri sont affichés (par défaut, l'affichage automatique est activé et immédiat)
+- Un footer avec un texte par défaut qui renvoie à l'outil Dataview et à son code source, mais qui peut être modifié par l'utilisateur via les options de l'interface de visualisation (par défaut, le footer est affiché)
+
+
+## Détails techniques
+
+- En mode "affichage automatique", le filtrage des données est effectué à chaque saisie dans le champ de recherche, mais on attend un minimum de caractères saisis avant de lancer le filtrage (par défaut, 3 caractères minimum) et on utilise un debounce de la saisie dans le champ de recherche, afin de lancer la recherche seulement quand l'utilisateur a fini de saisir sa recherche
+- On doit gérer les URLs de plusieurs types : CodiMD, Gitlab, Github, Framapad
+- Il faut détecter le type de données dans chaque colonne, afin de pouvoir trier correctement les données (exemple : si une colonne contient des dates, on doit trier les dates correctement, et non pas par ordre alphabétique)
+- Si une colonne contient des nombres, on doit trier les nombres correctement, et non pas par ordre alphabétique (par exemple : "item 2" doit être trié avant "item 10")
+- Si une cellule contient du Markdown, on doit le convertir en HTML pour l'affichage dans le tableau, mais on doit garder le texte brut pour le filtrage et le tri des données
+	- Le HTML est autorisé, mais on doit l'afficher en mode "safe" pour éviter les injections de code malveillant
+- On doit rester en mode défilement infini, sans pagination des résultats, mais éventuellement avec un bouton "charger plus de résultats" si le nombre de résultats est trop important (par exemple, plus de 1000 résultats)
+- On doit permettre un redimensionnement manuel des colonnes du tableau, avec mémorisation de la taille des colonnes dans l'URL pour retrouver les mêmes tailles de colonnes lors d'un partage du lien vers la page de l'interface de visualisation
+
+
+### Champs de recherche
+
+- La recherche est par défaut insensible à la casse et aux caractères accentués, mais on peut changer ces paramètres dans l'interface de paramétrage des options de l'interface de visualisation
+- On doit pouvoir faire une recherche d'expressions exactes si l'utilisateur met des guillemets autour de son texte de recherche (exemple : "texte exact")
+- On doit pouvoir utiliser une regex au format JavaScript pour faire une recherche avancée
+- On doit pouvoir utiliser une syntaxe de recherche simplifiée
+
+#### Syntaxe de recherche simplifiée
+
+- L'opérateur "ET" est représenté par un caractère "+" (par défaut)
+- L'opérateur "OU" est représenté par un pipe "|" (par défaut)
+- L'opérateur "NON" est représenté par un caractère "-" (par défaut). Par exemple : "terme1 -terme2" signifie "terme1 ET NON terme2"
+- On peut utiliser des parenthèses pour grouper les termes de recherche et définir l'ordre d'évaluation des opérateurs
+- Quand on utilise ces opérateurs, on trimme les espaces autour des termes de recherche, et on supprime les termes vides
+
+
+### Accessibilité
+
+- On doit respecter les bonnes pratiques d'accessibilité, notamment :
+  - Utilisation de couleurs contrastées pour le texte et les éléments interactifs
+  - Utilisation de labels pour les champs de formulaire
+  - Utilisation de titres et sous-titres pour structurer la page
+  - Utilisation de balises ARIA pour les éléments interactifs
+  - Navigation au clavier possible pour toutes les fonctionnalités
