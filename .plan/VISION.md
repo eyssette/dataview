@@ -146,3 +146,22 @@ Par défaut, on affiche :
   - Utilisation de titres et sous-titres pour structurer la page
   - Utilisation de balises ARIA pour les éléments interactifs
   - Navigation au clavier possible pour toutes les fonctionnalités
+
+### Design
+
+- L'interface de visualisation doit avoir un design par défaut simple et épuré, qui permet une lecture facile des données et une utilisation intuitive des fonctionnalités de tri et de filtrage.
+- On uilise des polices de base : `ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Segoe UI Emoji,Apple Color Emoji,Noto Color Emoji,Segoe UI Symbol`
+- Le design doit être responsive : il doit s'adapter à la taille de l'écran (ordinateur, tablette, smartphone).
+-  On propose par défaut 2 thèmes : 
+  - un thème clair (par défaut)
+  - un thème sombre
+- On peut changer le design par défaut via les options de l'interface de visualisation, avec la possibilité d'ajouter du CSS personnalisé pour modifier l'apparence de l'interface de visualisation.
+
+
+### Code
+
+- Code ultra optimisé pour un affichage rapide des données, pour toute les configurations possibles de données
+- Code modulaire et bien organisé
+- Code commenté pour faciliter la compréhension et la maintenance
+- Code maintenable et évolutif pour permettre l'ajout de nouvelles fonctionnalités facilement
+- Tests unitaires pour chaque composant et chaque fonctionnalité, avec un coverage de code élevé
